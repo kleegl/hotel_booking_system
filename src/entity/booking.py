@@ -9,7 +9,7 @@ class BookingStatus(Enum):
     COMPLETE = 2
 
 
-#класс-сущность Бронирование
+#класс-действие Бронирование
 class Booking:
     def __init__(self, id: int | None, user_id: int, hotel_id: int, check_in: datetime, check_out: datetime, total_price: float, status: BookingStatus) -> None:
         self.id = id

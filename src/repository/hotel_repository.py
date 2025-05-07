@@ -1,41 +1,37 @@
 from abc import ABC
 
 from entity.hotel import Hotel
-from repository.base_repository import IBaseRepository
-from schemas.hotel_schema import HotelCreateSchema, HotelUpdateSchema
+from repository.base_repository import BaseRepository, IBaseRepository
+from schemas.hotel_schema import CreateHotelSchema, UpdateHotelSchema
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class IHotelRepository(
-    IBaseRepository[Hotel, HotelCreateSchema, HotelUpdateSchema], ABC
+    IBaseRepository[Hotel, CreateHotelSchema, UpdateHotelSchema], ABC
 ):
     pass
 
 
-class HotelRepositroy(
-    IHotelRepository, IBaseRepository[Hotel, HotelCreateSchema, HotelUpdateSchema]
+class HotelRepository(
+    IHotelRepository, BaseRepository[Hotel, CreateHotelSchema, UpdateHotelSchema]
 ):
-    def create(self, item: HotelCreateSchema) -> None:
-        return super().create(item)
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, Hotel)
 
-    def update(self, item: HotelUpdateSchema) -> None:
-        return super().update(item)
+    async def create(self, item: CreateHotelSchema) -> Hotel:
+        return await super().create(item)
 
-    def delete(self, id: int) -> None:
-        return super().delete(id)
+    async def update(self, id: int, item: UpdateHotelSchema) -> UpdateHotelSchema:
+        return await super().update(id, item)
 
-    def get(self, id: int) -> Hotel | None:
-        return super().get(id)
+    async def delete(self, id: int) -> None:
+        return await super().delete(id)
 
-    def _map_to_entity(self, hotel: HotelCreateSchema) -> Hotel:
-        return Hotel(
-            id=hotel.id,
-            name=hotel.name,
-            location=hotel.location,
-            base_price=hotel.base_price,
-            capacity=hotel.capacity,
-        )
+    async def get(self, id: int) -> Hotel | None:
+        return await super().get(id)
 
-    def _update_entity(self, db_hotel: Hotel, hotel: HotelUpdateSchema) -> None:
+    def _update_entity(self, db_hotel: Hotel, hotel: UpdateHotelSchema) -> None:
         db_hotel.name = hotel.name
         db_hotel.location = hotel.location
         db_hotel.base_price = hotel.base_price

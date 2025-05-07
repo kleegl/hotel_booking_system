@@ -1,9 +1,11 @@
 import asyncio
+import sys
 from logging.config import fileConfig
 
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+from pathlib import Path
 
 from alembic import context
 
@@ -22,10 +24,13 @@ if config.config_file_name is not None:
 # target_metadata = mymodel.Base.metadata
 # target_metadata = None
 
-from src.entity.base_entity import BaseEntity
-from src.entity.booking import Booking
-from src.entity.hotel import Hotel
-from src.entity.user import User
+sys.path.append(str(Path(__file__).parent.parent))
+
+
+from entity.base_entity import BaseEntity
+from entity.booking import Booking
+from entity.hotel import Hotel
+from entity.user import User
 
 target_metadata = BaseEntity.metadata
 

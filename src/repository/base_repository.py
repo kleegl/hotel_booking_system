@@ -1,59 +1,57 @@
 from abc import ABC, abstractmethod
-from typing import Generic
+from typing import Generic, Type
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from extensions.db_list import DbList
 from generics import TBaseEntity, TCreateSchema, TUpdateSchema
 
 
 class IBaseRepository(Generic[TBaseEntity, TCreateSchema, TUpdateSchema], ABC):
     @abstractmethod
-    def create(self, item: TCreateSchema) -> None:
-        pass
+    async def create(self, item: TCreateSchema) -> TCreateSchema:
+        NotImplementedError()
 
     @abstractmethod
-    def update(self, item: TUpdateSchema) -> None:
-        pass
+    async def update(self, id: int, item: TUpdateSchema) -> TUpdateSchema:
+        NotImplementedError()
 
     @abstractmethod
-    def delete(self, id: int) -> None:
-        pass
+    async def delete(self, id: int) -> None:
+        NotImplementedError()
 
     @abstractmethod
-    def get(self, id: int) -> TBaseEntity | None:
-        pass
+    async def get(self, id: int) -> TBaseEntity:
+        NotImplementedError()
 
 
 class BaseRepository(
     IBaseRepository, Generic[TBaseEntity, TCreateSchema, TUpdateSchema]
 ):
-    __db: DbList[TBaseEntity] = DbList()
+    def __init__(self, session: AsyncSession, model: Type[TBaseEntity]) -> None:
+        self.session = session
+        self.model = model
 
-    def create(self, item: TCreateSchema):
-        try:
-            item_db = self._map_to_entity(item)
-            self.__db.append(item_db)
-        except:
-            raise ValueError(f"Ошибка при создании объекта типа {type(TBaseEntity)}")
+    async def create(self, item: TCreateSchema) -> TCreateSchema:
+        entity = self.model(**item.model_dump())
+        self.session.add(entity)
+        await self.session.commit()
+        await self.session.refresh(entity)
+        return entity
 
-    def update(self, id: int, item: TUpdateSchema) -> None:
-        item_from_db = self.__db.find_by_id(id)
-        if item_from_db != None:
-            self._update_entity(item_from_db, item)
-        else:
-            raise ValueError(f"Объект типа {type(TBaseEntity)} с id = {id} не найден")
+    async def update(self, id: int, item: TUpdateSchema) -> TUpdateSchema:
+        result = await self.session.get(TBaseEntity, id)
+        if result:
+            self._update_entity(result, item)
+            # await self.session.commit()
+        return result
 
-    def delete(self, id: int) -> None:
-        item_from_db = self.__db.find_by_id(id)
-        if item_from_db != None:
-            self.__db.remove(item_from_db)
-        else:
-            raise ValueError(f"Объект типа {type(TBaseEntity)} с id = {id} не найден")
+    async def delete(self, id: int) -> None:
+        result = await self.session.get(TBaseEntity, id)
+        if result:
+            self.session.delete(result)
+            # self.session.commit()
 
-    def get(self, id: int) -> TBaseEntity | None:
-        return self.__db.find_by_id(id)
-
-    @abstractmethod
-    def _map_to_entity(self, item: TCreateSchema) -> TBaseEntity: ...
+    async def get(self, id: int) -> TBaseEntity:
+        return await self.session.get(TBaseEntity, id)
 
     @abstractmethod
     def _update_entity(

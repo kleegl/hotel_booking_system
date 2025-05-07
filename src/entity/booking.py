@@ -1,6 +1,6 @@
 from sqlalchemy import CheckConstraint, Column, DateTime, Float, Enum, ForeignKey
 from sqlalchemy.orm import Relationship, Mapped
-from src.entity.base_entity import BaseEntity
+from entity.base_entity import BaseEntity
 import enum
 
 

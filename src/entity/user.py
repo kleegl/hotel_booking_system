@@ -1,8 +1,8 @@
 from typing import Any
 from sqlalchemy import Column, Dialect, String, TypeDecorator
 from sqlalchemy.orm import Relationship, Mapped
-from src.exceptions.validation import ValidationException
-from src.entity.base_entity import BaseEntity
+from exceptions.validation import ValidationException
+from entity.base_entity import BaseEntity
 import re
 
 

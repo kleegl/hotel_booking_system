@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Float, CheckConstraint
-from src.entity.base_entity import BaseEntity
+from entity.base_entity import BaseEntity
 
 
 class Hotel(BaseEntity):

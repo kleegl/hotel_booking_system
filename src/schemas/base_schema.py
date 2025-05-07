@@ -1,13 +1,5 @@
-from abc import ABC
+from pydantic import BaseModel
 
 
-class BaseSchema(ABC):
-    pass
-
-
-class BaseCreateSchema(BaseSchema):
-    pass
-
-
-class BaseUpdateSchema(BaseSchema):
+class BaseSchema(BaseModel):
     pass

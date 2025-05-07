@@ -10,11 +10,15 @@ class BaseHotelSchema(BaseSchema):
 
 
 class HotelCreateSchema(BaseHotelSchema):
-    def __init__(self, id: int | None, name: str, location: str, base_price: float, capacity: int) -> None:
+    def __init__(
+        self, id: int | None, name: str, location: str, base_price: float, capacity: int
+    ) -> None:
         super().__init__(name, location, base_price, capacity)
         self.id = id
 
 
 class HotelUpdateSchema(BaseHotelSchema):
-    def __init__(self, name: str, location: str, base_price: float, capacity: int) -> None:
+    def __init__(
+        self, name: str, location: str, base_price: float, capacity: int
+    ) -> None:
         super().__init__(name, location, base_price, capacity)

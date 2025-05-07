@@ -1,22 +1,12 @@
-import random
+from sqlalchemy import Column, Integer, String, Float, CheckConstraint
+from src.entity.base_entity import BaseEntity
 
 
-class Hotel:
-    def __init__(self, id: int | None, name: str, location: str, base_price: float, capacity: int) -> None:
-        self.id = id
-        self.name = name
-        self.location = location
-        self.base_price = base_price #цена за ночь
-        self.capacity = capacity #количество доступных номеров
-        
-        
-    @property
-    def id(self) -> int:
-        return self._id
+class Hotel(BaseEntity):
+    name = Column(String, nullable=False)
+    location = Column(String, nullable=False)
+    base_price = Column(Float, nullable=False, doc="цена за ночь")
+    capacity = Column(Integer, nullable=False, doc="количество доступных номеров")
 
-    @id.setter
-    def id(self, id: int | None) -> None:
-        if id != None:
-            self._id = id
-        else:
-            self._id = random.randint(1, 1000)
+    CheckConstraint("base_price > 0", name="valid_base_price")
+    CheckConstraint("capacity >= 0", name="valid_capacity")

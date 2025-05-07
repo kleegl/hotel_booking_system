@@ -1,13 +1,16 @@
+import uvicorn
+from fastapi import FastAPI
 
+from routers.hotel_router import hotel_router
+from routers.user_router import user_router
+from routers.booking_router import booking_router
 
-from managers.booking_manager import UserManager
-from repository.user_repository import UserCreateSchema, UserRepository
+app = FastAPI()
+
+app.include_router(hotel_router)
+app.include_router(user_router)
+app.include_router(booking_router)
 
 
 if __name__ == "__main__":
-    user_repository = UserRepository()
-    
-    # user_repository.create(UserCreateSchema(1, "name", "qwe", "123", None))
-    # user_repository.create(UserCreateSchema(None, "name", "qwe", "123", None))
-    # user_repository.get(1)
-    # user_manager.create_user(UserCreateSchema(1, "name", "qwe", "123", None))
+    uvicorn.run("main:app", reload=True)

@@ -1,34 +1,30 @@
-from datetime import datetime
-import random
-from enum import Enum
+from sqlalchemy import CheckConstraint, Column, DateTime, Float, Enum, ForeignKey
+from sqlalchemy.orm import Relationship, Mapped
+from src.entity.base_entity import BaseEntity
+import enum
 
 
-class BookingStatus(Enum):
-    CONFIRM = 0
-    CANCEL = 1
-    COMPLETE = 2
+class BookingStatus(enum.Enum):
+    PENDING = 0
+    CONFIRM = 1
+    CANCEL = 2
+    COMPLETE = 3
 
 
-#класс-действие Бронирование
-class Booking:
-    def __init__(self, id: int | None, user_id: int, hotel_id: int, check_in: datetime, check_out: datetime, total_price: float, status: BookingStatus) -> None:
-        self.id = id
-        self.user_id = user_id
-        self.hotel_id = hotel_id
-        self.check_in = check_in
-        self.check_out = check_out
-        self.total_price = total_price
-        self.status = status
-        
-        
-    @property
-    def id(self) -> int:
-        return self._id
+class Booking(BaseEntity):
+    user_id = Column(ForeignKey("users.id"))
+    user: Mapped["User"] = Relationship(back_populates="bookings")
+    hotel_id = Column(ForeignKey("hotels.id"))
+    hotel: Mapped["Hotel"] = Relationship(back_populates="bookings")
+    check_in = Column(DateTime(timezone=True), doc="дата и время заезда")
+    check_out = Column(DateTime(timezone=True), doc="дата и время выезда")
+    total_price = Column(Float, nullable=False, doc="общая стоимость бронирования")
+    status = Column(
+        Enum(BookingStatus, name="booking_status"),
+        nullable=False,
+        default=BookingStatus.PENDING,
+        doc="статус заявки",
+    )
 
-    @id.setter
-    def id(self, id: int | None) -> None:
-        if id != None:
-            self._id = id
-        else:
-            self._id = random.randint(1, 1000)
-    
+    CheckConstraint("check_out > check_in", name="valid_dates")
+    CheckConstraint("total_price > 0", name="valid_total_price")

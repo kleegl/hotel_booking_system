@@ -1,40 +1,41 @@
 from abc import ABC, abstractmethod
+from typing import Type
+
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from entity.user import User
 from repository.base_repository import BaseRepository, IBaseRepository
-from schemas.user_schemas import UserCreateSchema, UserUpdateSchema
+from schemas.user_schemas import CreateUserSchema, UpdateUserSchema
 
 
-class IUserRepository(IBaseRepository[User, UserCreateSchema, UserUpdateSchema], ABC):
+class IUserRepository(IBaseRepository[User, CreateUserSchema, UpdateUserSchema], ABC):
     pass
 
 
 class UserRepository(
-    IUserRepository, BaseRepository[User, UserCreateSchema, UserUpdateSchema]
+    IUserRepository, BaseRepository[User, CreateUserSchema, UpdateUserSchema]
 ):
-    def create(self, item: UserCreateSchema) -> None:
-        return super().create(item)
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, User)
 
-    def update(self, item: UserUpdateSchema) -> None:
-        return super().update(item)
+    async def create(self, item: CreateUserSchema) -> None:
+        return await super().create(item)
 
-    def delete(self, id: int) -> None:
-        return super().delete(id)
+    async def update(self, id: int, item: UpdateUserSchema) -> None:
+        return await super().update(id, item)
 
-    def get(self, id: int) -> User | None:
-        return super().get(id)
+    async def delete(self, id: int) -> None:
+        return await super().delete(id)
 
-    def _map_to_entity(self, user: UserCreateSchema) -> User:
-        return User(
-            id=user.id,
-            name=user.name,
-            email=user.email,
-            phone_number=user.phone_number,
-            booking_ids=user.booking_ids,
-        )
+    async def get(self, id: int) -> User | None:
+        return await super().get(id)
 
-    def _update_entity(self, db_user: User, user: UserUpdateSchema) -> None:
-        db_user.name = user.name
-        db_user.email = user.email
-        db_user.phone_number = user.phone_number
-        db_user.booking_ids = user.booking_ids
+    def _update_entity(self, db_user: User, user: UpdateUserSchema) -> None:
+        if user.name:
+            db_user.name = user.name
+        if user.email:
+            db_user.email = user.email
+        if user.phone_number:
+            db_user.phone_number = user.phone_number
+        if user.password_hash:
+            db_user.password_hash = user.password_hash

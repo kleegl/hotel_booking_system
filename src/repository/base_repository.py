@@ -19,7 +19,7 @@ class IBaseRepository(Generic[TBaseEntity, TCreateSchema, TUpdateSchema], ABC):
         NotImplementedError()
 
     @abstractmethod
-    async def get(self, id: int) -> TBaseEntity:
+    async def get_by_id(self, id: int) -> TBaseEntity:
         NotImplementedError()
 
 
@@ -38,20 +38,20 @@ class BaseRepository(
         return entity
 
     async def update(self, id: int, item: TUpdateSchema) -> TUpdateSchema:
-        result = await self.session.get(TBaseEntity, id)
+        result = await self.session.get(self.model, id)
         if result:
             self._update_entity(result, item)
-            # await self.session.commit()
+            await self.session.commit()
         return result
 
     async def delete(self, id: int) -> None:
-        result = await self.session.get(TBaseEntity, id)
+        result = await self.session.get(self.model, id)
         if result:
-            self.session.delete(result)
-            # self.session.commit()
+            await self.session.delete(result)
+            await self.session.commit()
 
-    async def get(self, id: int) -> TBaseEntity:
-        return await self.session.get(TBaseEntity, id)
+    async def get_by_id(self, id: int) -> TBaseEntity:
+        return await self.session.get(self.model, id)
 
     @abstractmethod
     def _update_entity(

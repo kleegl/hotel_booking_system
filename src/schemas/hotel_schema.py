@@ -13,7 +13,10 @@ class CreateHotelSchema(BaseHotelSchema):
 
 
 class UpdateHotelSchema(BaseHotelSchema):
-    pass
+    name: str | None
+    location: str | None
+    base_price: float | None
+    capacity: int | None
 
 
 class HotelQuery(BaseHotelSchema):

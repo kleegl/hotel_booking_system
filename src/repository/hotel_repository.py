@@ -28,11 +28,15 @@ class HotelRepository(
     async def delete(self, id: int) -> None:
         return await super().delete(id)
 
-    async def get(self, id: int) -> Hotel | None:
-        return await super().get(id)
+    async def get_by_id(self, id: int) -> Hotel | None:
+        return await super().get_by_id(id)
 
     def _update_entity(self, db_hotel: Hotel, hotel: UpdateHotelSchema) -> None:
-        db_hotel.name = hotel.name
-        db_hotel.location = hotel.location
-        db_hotel.base_price = hotel.base_price
-        db_hotel.capacity = hotel.capacity
+        if hotel.name:
+            db_hotel.name = hotel.name
+        if hotel.location:
+            db_hotel.location = hotel.location
+        if hotel.base_price:
+            db_hotel.base_price = hotel.base_price
+        if hotel.capacity:
+            db_hotel.capacity = hotel.capacity

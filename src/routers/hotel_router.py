@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends
 
 from database.db import DatabaseSession
 from repository.hotel_repository import IHotelRepository, HotelRepository
-from schemas.hotel_schema import CreateHotelSchema, HotelQuery, UpdateHotelSchema
+from schemas.hotel_schema import CreateHotelSchema, UpdateHotelSchema
 
 hotel_router = APIRouter(prefix="/hotel", tags=["hotel"])
 database = DatabaseSession()
@@ -16,17 +16,15 @@ def get_repository(db: AsyncSession = Depends(database.get_db)) -> IHotelReposit
 @hotel_router.get("/{id}")
 async def get_by_id(
     id: int,
-    db: AsyncSession = Depends(database.get_db),
     repository: IHotelRepository = Depends(get_repository),
 ):
-    hotel = await repository.get(id)
+    hotel = await repository.get_by_id(id)
     return hotel
 
 
 @hotel_router.post("/create")
 async def create(
     create_hotel_schema: CreateHotelSchema,
-    db: AsyncSession = Depends(database.get_db),
     repository: IHotelRepository = Depends(get_repository),
 ) -> CreateHotelSchema:
     result = await repository.create(create_hotel_schema)
@@ -37,7 +35,6 @@ async def create(
 async def update(
     id: int,
     update_hotel_schema: UpdateHotelSchema,
-    db: AsyncSession = Depends(database.get_db),
     repository: IHotelRepository = Depends(get_repository),
 ):
     await repository.update(id, update_hotel_schema)
@@ -46,7 +43,6 @@ async def update(
 @hotel_router.delete("/delete/{id}")
 async def delete(
     id: int,
-    db: AsyncSession = Depends(database.get_db),
     repository: IHotelRepository = Depends(get_repository),
 ):
     await repository.delete(id)

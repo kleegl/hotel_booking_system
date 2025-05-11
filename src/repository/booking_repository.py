@@ -1,24 +1,24 @@
 from abc import ABC
 
-from entity.booking import Booking
+from models import Booking
 from repository.base_repository import BaseRepository, IBaseRepository
-from schemas.booking_schema import BookingCreateSchema, BookingUpdateSchema
+from response.booking_response import BookingCreateResponse, BookingUpdateResponse
 
 
 class IBookingRepository(
-    IBaseRepository[Booking, BookingCreateSchema, BookingUpdateSchema], ABC
+    IBaseRepository[Booking, BookingCreateResponse, BookingUpdateResponse], ABC
 ):
     pass
 
 
 class BookingRepositroy(
     IBookingRepository,
-    BaseRepository[Booking, BookingCreateSchema, BookingUpdateSchema],
+    BaseRepository[Booking, BookingCreateResponse, BookingUpdateResponse],
 ):
-    def create(self, item: BookingCreateSchema) -> None:
+    def create(self, item: BookingCreateResponse) -> None:
         return super().create(item)
 
-    def update(self, item: BookingUpdateSchema) -> None:
+    def update(self, item: BookingUpdateResponse) -> None:
         return super().update(item)
 
     def delete(self, id: int) -> None:
@@ -27,7 +27,7 @@ class BookingRepositroy(
     def get(self, id: int) -> Booking | None:
         return super().get(id)
 
-    def _map_to_entity(self, booking: BookingCreateSchema) -> Booking:
+    def _map_to_entity(self, booking: BookingCreateResponse) -> Booking:
         return Booking(
             id=booking.id,
             user_id=booking.user_id,
@@ -38,7 +38,9 @@ class BookingRepositroy(
             status=booking.status,
         )
 
-    def _update_entity(self, db_booking: Booking, booking: BookingUpdateSchema) -> None:
+    def _update_entity(
+        self, db_booking: Booking, booking: BookingUpdateResponse
+    ) -> None:
         db_booking.user_id = booking.user_id
         db_booking.hotel_id = booking.hotel_id
         db_booking.check_in = booking.check_in

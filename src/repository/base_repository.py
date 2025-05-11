@@ -2,16 +2,16 @@ from abc import ABC, abstractmethod
 from typing import Generic, Type
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from generics import TBaseEntity, TCreateSchema, TUpdateSchema
+from generics import TBaseEntity, TCreateResponse, TUpdateResponse
 
 
-class IBaseRepository(Generic[TBaseEntity, TCreateSchema, TUpdateSchema], ABC):
+class IBaseRepository(Generic[TBaseEntity, TCreateResponse, TUpdateResponse], ABC):
     @abstractmethod
-    async def create(self, item: TCreateSchema) -> TCreateSchema:
+    async def create(self, item: TCreateResponse) -> TCreateResponse:
         NotImplementedError()
 
     @abstractmethod
-    async def update(self, id: int, item: TUpdateSchema) -> TUpdateSchema:
+    async def update(self, id: int, item: TUpdateResponse) -> TUpdateResponse:
         NotImplementedError()
 
     @abstractmethod
@@ -24,20 +24,20 @@ class IBaseRepository(Generic[TBaseEntity, TCreateSchema, TUpdateSchema], ABC):
 
 
 class BaseRepository(
-    IBaseRepository, Generic[TBaseEntity, TCreateSchema, TUpdateSchema]
+    IBaseRepository, Generic[TBaseEntity, TCreateResponse, TUpdateResponse]
 ):
     def __init__(self, session: AsyncSession, model: Type[TBaseEntity]) -> None:
         self.session = session
         self.model = model
 
-    async def create(self, item: TCreateSchema) -> TCreateSchema:
+    async def create(self, item: TCreateResponse) -> TCreateResponse:
         entity = self.model(**item.model_dump())
         self.session.add(entity)
         await self.session.commit()
         await self.session.refresh(entity)
         return entity
 
-    async def update(self, id: int, item: TUpdateSchema) -> TUpdateSchema:
+    async def update(self, id: int, item: TUpdateResponse) -> TUpdateResponse:
         result = await self.session.get(self.model, id)
         if result:
             self._update_entity(result, item)
@@ -55,5 +55,5 @@ class BaseRepository(
 
     @abstractmethod
     def _update_entity(
-        self, db_item: TBaseEntity, update_item: TUpdateSchema
+        self, db_item: TBaseEntity, update_item: TUpdateResponse
     ) -> None: ...

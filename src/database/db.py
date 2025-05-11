@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 import os
 
-from entity import BaseEntity, Hotel, User, Booking
+from models import BaseEntity, Hotel, User, Booking
 
 
 class DatabaseSession:

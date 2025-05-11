@@ -3,25 +3,27 @@ from typing import Type
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from entity.user import User
+from models import User
 from repository.base_repository import BaseRepository, IBaseRepository
-from schemas.user_schemas import CreateUserSchema, UpdateUserSchema
+from response.user_response import CreateUserResponse, UpdateUserResponse
 
 
-class IUserRepository(IBaseRepository[User, CreateUserSchema, UpdateUserSchema], ABC):
+class IUserRepository(
+    IBaseRepository[User, CreateUserResponse, UpdateUserResponse], ABC
+):
     pass
 
 
 class UserRepository(
-    IUserRepository, BaseRepository[User, CreateUserSchema, UpdateUserSchema]
+    IUserRepository, BaseRepository[User, CreateUserResponse, UpdateUserResponse]
 ):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
 
-    async def create(self, item: CreateUserSchema) -> None:
+    async def create(self, item: CreateUserResponse) -> None:
         return await super().create(item)
 
-    async def update(self, id: int, item: UpdateUserSchema) -> None:
+    async def update(self, id: int, item: UpdateUserResponse) -> None:
         return await super().update(id, item)
 
     async def delete(self, id: int) -> None:
@@ -30,7 +32,7 @@ class UserRepository(
     async def get(self, id: int) -> User | None:
         return await super().get(id)
 
-    def _update_entity(self, db_user: User, user: UpdateUserSchema) -> None:
+    def _update_entity(self, db_user: User, user: UpdateUserResponse) -> None:
         if user.name:
             db_user.name = user.name
         if user.email:

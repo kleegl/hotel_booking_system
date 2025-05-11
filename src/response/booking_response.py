@@ -1,9 +1,9 @@
 from datetime import datetime
-from entity.booking import BookingStatus
-from schemas.base_schema import BaseSchema
+from models import BookingStatus
+from response.base_response import BaseResponse
 
 
-class BaseBookingSchema(BaseSchema):
+class BaseBookingResponse(BaseResponse):
     def __init__(
         self,
         user_id: int,
@@ -21,7 +21,7 @@ class BaseBookingSchema(BaseSchema):
         self.status = status
 
 
-class BookingCreateSchema(BaseBookingSchema):
+class BookingCreateResponse(BaseBookingResponse):
     def __init__(
         self,
         id: int | None,
@@ -36,7 +36,7 @@ class BookingCreateSchema(BaseBookingSchema):
         self.id = id
 
 
-class BookingUpdateSchema(BaseBookingSchema):
+class BookingUpdateResponse(BaseBookingResponse):
     def __init__(
         self,
         user_id: int,

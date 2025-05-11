@@ -1,18 +1,18 @@
-from schemas.base_schema import BaseSchema
+from response.base_response import BaseResponse
 
 
-class BaseUserSchema(BaseSchema):
+class BaseUserResponse(BaseResponse):
     name: str
     email: str
     phone_number: str
     password_hash: str
 
 
-class CreateUserSchema(BaseUserSchema):
+class CreateUserResponse(BaseUserResponse):
     pass
 
 
-class UpdateUserSchema(BaseUserSchema):
+class UpdateUserResponse(BaseUserResponse):
     name: str | None
     email: str | None
     phone_number: str | None

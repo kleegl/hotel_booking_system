@@ -1,28 +1,28 @@
 from abc import ABC
 
-from entity.hotel import Hotel
+from models import Hotel
 from repository.base_repository import BaseRepository, IBaseRepository
-from schemas.hotel_schema import CreateHotelSchema, UpdateHotelSchema
+from response.hotel_response import CreateHotelResponse, UpdateHotelResponse
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
 class IHotelRepository(
-    IBaseRepository[Hotel, CreateHotelSchema, UpdateHotelSchema], ABC
+    IBaseRepository[Hotel, CreateHotelResponse, UpdateHotelResponse], ABC
 ):
     pass
 
 
 class HotelRepository(
-    IHotelRepository, BaseRepository[Hotel, CreateHotelSchema, UpdateHotelSchema]
+    IHotelRepository, BaseRepository[Hotel, CreateHotelResponse, UpdateHotelResponse]
 ):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, Hotel)
 
-    async def create(self, item: CreateHotelSchema) -> Hotel:
+    async def create(self, item: CreateHotelResponse) -> Hotel:
         return await super().create(item)
 
-    async def update(self, id: int, item: UpdateHotelSchema) -> UpdateHotelSchema:
+    async def update(self, id: int, item: UpdateHotelResponse) -> UpdateHotelResponse:
         return await super().update(id, item)
 
     async def delete(self, id: int) -> None:
@@ -31,7 +31,7 @@ class HotelRepository(
     async def get_by_id(self, id: int) -> Hotel | None:
         return await super().get_by_id(id)
 
-    def _update_entity(self, db_hotel: Hotel, hotel: UpdateHotelSchema) -> None:
+    def _update_entity(self, db_hotel: Hotel, hotel: UpdateHotelResponse) -> None:
         if hotel.name:
             db_hotel.name = hotel.name
         if hotel.location:

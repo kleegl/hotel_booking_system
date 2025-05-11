@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from pathlib import Path
 
 from alembic import context
+from src.models import BaseEntity, Hotel, User, Booking
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -26,11 +27,8 @@ if config.config_file_name is not None:
 
 sys.path.append(str(Path(__file__).parent.parent))
 
+sys.path.append(str(Path(__file__).parent.parent / "src"))
 
-from entity.base_entity import BaseEntity
-from entity.booking import Booking
-from entity.hotel import Hotel
-from entity.user import User
 
 target_metadata = BaseEntity.metadata
 

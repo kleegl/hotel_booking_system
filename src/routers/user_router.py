@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.db import DatabaseSession
-from repository.user_repository import IUserRepository, UserRepository
-from response.user_response import CreateUserResponse, UpdateUserResponse
+from repository.user_repository import UserRepository, IUserRepository
+from schemas.user_schema import UserCreateSchema, UserUpdateSchema, UserResponseSchema
 
 
 user_router = APIRouter(prefix="/user", tags=["user"])
@@ -13,28 +13,31 @@ def get_repositroy(db: AsyncSession = Depends(database.get_db)) -> IUserReposito
     return UserRepository(db)
 
 
-@user_router.get("/")
+@user_router.get("/{id}", response_model=UserResponseSchema)
 async def get_by_id(id: int, repository: IUserRepository = Depends(get_repositroy)):
-    result = await repository.get_by_id(id)
-    return result
+    user = await repository.get_by_id(id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return UserResponseSchema.model_validate(user)
 
 
-@user_router.post("/create")
+@user_router.post("/create", response_model=UserResponseSchema)
 async def create(
-    cretae_user_Response: CreateUserResponse,
+    cretae_user_request: UserCreateSchema,
     repository: IUserRepository = Depends(get_repositroy),
 ):
-    result = await repository.create(cretae_user_Response)
-    return result
+    user = await repository.create(cretae_user_request)
+    return user
 
 
-@user_router.patch("/update")
+@user_router.patch("/update", response_model=UserResponseSchema)
 async def update(
     id: int,
-    update_user_Response: UpdateUserResponse,
+    update_user_request: UserUpdateSchema,
     repository: IUserRepository = Depends(get_repositroy),
 ):
-    await repository.update(id, update_user_Response)
+    user = await repository.update(id, update_user_request)
+    return user
 
 
 @user_router.delete("/delete")

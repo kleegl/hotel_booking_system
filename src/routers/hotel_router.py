@@ -33,8 +33,8 @@ async def create(
     create_hotel_request: HotelCreateSchema,
     repository: IHotelRepository = Depends(get_repository),
 ) -> HotelResponseSchema:
-    result = await repository.create(create_hotel_request)
-    return result
+    hotel = await repository.create(create_hotel_request)
+    return hotel
 
 
 @hotel_router.patch("/update", response_model=HotelResponseSchema)
@@ -43,8 +43,8 @@ async def update(
     update_hotel_Response: HotelUpdateSchema,
     repository: IHotelRepository = Depends(get_repository),
 ):
-    result = await repository.update(id, update_hotel_Response)
-    return result
+    hotel = await repository.update(id, update_hotel_Response)
+    return hotel
 
 
 @hotel_router.delete("/delete/{id}")

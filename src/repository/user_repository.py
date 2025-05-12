@@ -1,29 +1,28 @@
-from abc import ABC, abstractmethod
-from typing import Type
+from abc import ABC
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from models import User
 from repository.base_repository import BaseRepository, IBaseRepository
-from response.user_response import CreateUserResponse, UpdateUserResponse
+from schemas.user_schema import (
+    UserCreateSchema,
+    UserUpdateSchema,
+    BaseSchema,
+)
 
 
-class IUserRepository(
-    IBaseRepository[User, CreateUserResponse, UpdateUserResponse], ABC
-):
+class IUserRepository(IBaseRepository[User, BaseSchema], ABC):
     pass
 
 
-class UserRepository(
-    IUserRepository, BaseRepository[User, CreateUserResponse, UpdateUserResponse]
-):
+class UserRepository(IUserRepository, BaseRepository[User, BaseSchema]):
     def __init__(self, session: AsyncSession) -> None:
         super().__init__(session, User)
 
-    async def create(self, item: CreateUserResponse) -> None:
+    async def create(self, item: UserCreateSchema) -> User:
         return await super().create(item)
 
-    async def update(self, id: int, item: UpdateUserResponse) -> None:
+    async def update(self, id: int, item: UserUpdateSchema) -> User:
         return await super().update(id, item)
 
     async def delete(self, id: int) -> None:
@@ -31,13 +30,3 @@ class UserRepository(
 
     async def get(self, id: int) -> User | None:
         return await super().get(id)
-
-    def _update_entity(self, db_user: User, user: UpdateUserResponse) -> None:
-        if user.name:
-            db_user.name = user.name
-        if user.email:
-            db_user.email = user.email
-        if user.phone_number:
-            db_user.phone_number = user.phone_number
-        if user.password_hash:
-            db_user.password_hash = user.password_hash

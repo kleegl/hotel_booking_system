@@ -1,8 +1,8 @@
 from typing import TypeVar
+
+from pydantic import BaseModel
 from models import BaseEntity
-from response.base_response import BaseResponse
 
 
 TBaseEntity = TypeVar("TBaseEntity", bound=BaseEntity)
-TCreateResponse = TypeVar("TCreateResponse", bound=BaseResponse)
-TUpdateResponse = TypeVar("TUpdateResponse", bound=BaseResponse)
+TSchema = TypeVar("TSchema", bound=BaseModel)

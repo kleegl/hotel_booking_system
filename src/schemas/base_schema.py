@@ -1,13 +1,5 @@
-from abc import ABC
+from pydantic import BaseModel, ConfigDict
 
 
-class BaseSchema(ABC):
-    pass
-
-
-class BaseCreateSchema(BaseSchema):
-    pass
-
-
-class BaseUpdateSchema(BaseSchema):
-    pass
+class BaseSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)

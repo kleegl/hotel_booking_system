@@ -1,37 +1,32 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
-from entity.user import User
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from models import User
 from repository.base_repository import BaseRepository, IBaseRepository
-from schemas.user_schemas import UserCreateSchema, UserUpdateSchema
+from schemas.user_schema import (
+    UserCreateSchema,
+    UserUpdateSchema,
+    BaseSchema,
+)
 
 
-class IUserRepository(IBaseRepository[User, UserCreateSchema, UserUpdateSchema], ABC):
+class IUserRepository(IBaseRepository[User, BaseSchema], ABC):
     pass
 
 
-class UserRepository(IUserRepository, BaseRepository[User, UserCreateSchema, UserUpdateSchema]):
-    def create(self, item: UserCreateSchema) -> None:
-        return super().create(item)
-    
-    
-    def update(self, item: UserUpdateSchema) -> None:
-        return super().update(item)
-    
-    
-    def delete(self, id: int) -> None:
-        return super().delete(id)
-    
-    
-    def get(self, id: int) -> User | None:
-        return super().get(id)
-    
-    
-    def _map_to_entity(self, user: UserCreateSchema) -> User:
-        return User(id=user.id, name=user.name, email=user.email, phone_number=user.phone_number, booking_ids=user.booking_ids)
+class UserRepository(IUserRepository, BaseRepository[User, BaseSchema]):
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, User)
 
+    async def create(self, item: UserCreateSchema) -> User:
+        return await super().create(item)
 
-    def _update_entity(self, db_user: User, user: UserUpdateSchema) -> None:
-        db_user.name = user.name
-        db_user.email = user.email 
-        db_user.phone_number = user.phone_number 
-        db_user.booking_ids = user.booking_ids
+    async def update(self, id: int, item: UserUpdateSchema) -> User:
+        return await super().update(id, item)
+
+    async def delete(self, id: int) -> None:
+        return await super().delete(id)
+
+    async def get(self, id: int) -> User | None:
+        return await super().get(id)

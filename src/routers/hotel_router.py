@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 
 from database.db import DatabaseSession
 from repository.hotel_repository import IHotelRepository, HotelRepository
@@ -40,10 +40,10 @@ async def create(
 @hotel_router.patch("/update", response_model=HotelResponseSchema)
 async def update(
     id: int,
-    update_hotel_Response: HotelUpdateSchema,
+    update_hotel_response: HotelUpdateSchema,
     repository: IHotelRepository = Depends(get_repository),
 ):
-    hotel = await repository.update(id, update_hotel_Response)
+    hotel = await repository.update(id, update_hotel_response)
     return hotel
 
 

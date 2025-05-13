@@ -1,5 +1,4 @@
 from abc import ABC
-from typing import Type
 
 from models import Booking
 from repository.base_repository import BaseRepository, IBaseRepository

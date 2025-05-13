@@ -37,6 +37,6 @@ async def test_get_hotel(test_hotel_data):
         assert create_response.status_code == 200
         data = create_response.json()
 
-        get_response = await client.get(f"/hotel/{data["id"]}")
+        get_response = await client.get(f"/hotel/{data['id']}")
         assert get_response.status_code == 200
         assert get_response.json()["name"] == test_hotel_data["name"]

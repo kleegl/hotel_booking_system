@@ -11,7 +11,6 @@ from repository.room_repository import RoomRepository
 from repository.user_repository import UserRepository
 from repository.booking_repository import BookingRepository
 
-from schemas.base_schema import BaseSchema
 from schemas.booking_schema import (
     BookingResponseSchema,
     BookingCreateSchema,

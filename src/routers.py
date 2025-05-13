@@ -9,23 +9,34 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from repository.hotel_repository import HotelRepository
 from repository.room_repository import RoomRepository
 from repository.user_repository import UserRepository
+from repository.booking_repository import BookingRepository
+
 from schemas.base_schema import BaseSchema
-from schemas.hotel_schema import HotelResponseSchema
-from schemas.room_schema import RoomResponseSchema
-from schemas.user_schema import UserResponseSchema
+from schemas.booking_schema import (
+    BookingResponseSchema,
+    BookingCreateSchema,
+    BookingUpdateSchema,
+)
+from schemas.hotel_schema import (
+    HotelResponseSchema,
+    HotelCreateSchema,
+    HotelUpdateSchema,
+)
+from schemas.room_schema import RoomResponseSchema, RoomCreateSchema, RoomUpdateSchema
+from schemas.user_schema import UserResponseSchema, UserCreateSchema, UserUpdateSchema
 
 
 def create_router(
     prefix: str,
     response_model: Type[TBaseEntity],
-    schema: Type[TSchema],
+    create_model: Type[TSchema],
+    update_model: Type[TSchema],
     repository_type: Type[IBaseRepository[TBaseEntity, TSchema]],
-    database: DatabaseSession,
 ) -> APIRouter:
     router = APIRouter(prefix=f"/{prefix}", tags=[prefix])
 
     def get_repository(
-        db: AsyncSession = Depends(database.get_db),
+        db: AsyncSession = Depends(DatabaseSession().get_db),
     ) -> IBaseRepository[TBaseEntity, TSchema]:
         return repository_type(db)
 
@@ -43,7 +54,7 @@ def create_router(
 
     @router.post("/create", response_model=response_model)
     async def create(
-        item: schema,
+        item: create_model,
         repository: IBaseRepository[TBaseEntity, TSchema] = Depends(get_repository),
     ):
         response_item = await repository.create(item)
@@ -52,7 +63,7 @@ def create_router(
     @router.patch("/update", response_model=response_model)
     async def update(
         id: int,
-        item: schema,
+        item: update_model,
         repository: IBaseRepository[TBaseEntity, TSchema] = Depends(get_repository),
     ):
         response_item = await repository.update(id, item)
@@ -71,23 +82,32 @@ def create_router(
 hotel_router = create_router(
     prefix="hotels",
     response_model=HotelResponseSchema,
-    schema=BaseSchema,
+    create_model=HotelCreateSchema,
+    update_model=HotelUpdateSchema,
     repository_type=HotelRepository,
-    database=DatabaseSession(),
 )
 
 room_router = create_router(
     prefix="rooms",
     response_model=RoomResponseSchema,
-    schema=BaseSchema,
+    create_model=RoomCreateSchema,
+    update_model=RoomUpdateSchema,
     repository_type=RoomRepository,
-    database=DatabaseSession(),
 )
 
 user_router = create_router(
     prefix="users",
     response_model=UserResponseSchema,
-    schema=BaseSchema,
+    create_model=UserCreateSchema,
+    update_model=UserUpdateSchema,
     repository_type=UserRepository,
-    database=DatabaseSession(),
+)
+
+
+booking_router = create_router(
+    prefix="bookings",
+    response_model=BookingResponseSchema,
+    create_model=BookingCreateSchema,
+    update_model=BookingUpdateSchema,
+    repository_type=BookingRepository,
 )

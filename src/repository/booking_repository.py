@@ -1,48 +1,36 @@
 from abc import ABC
+from typing import Type
 
 from models import Booking
 from repository.base_repository import BaseRepository, IBaseRepository
-from response.booking_response import BookingCreateResponse, BookingUpdateResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from schemas.base_schema import BaseSchema
+from schemas.booking_schema import (
+    BookingCreateSchema,
+    BookingUpdateSchema,
+)
 
 
-class IBookingRepository(
-    IBaseRepository[Booking, BookingCreateResponse, BookingUpdateResponse], ABC
-):
+class IBookingRepository(IBaseRepository[Booking, BaseSchema], ABC):
     pass
 
 
-class BookingRepositroy(
+class BookingRepository(
     IBookingRepository,
-    BaseRepository[Booking, BookingCreateResponse, BookingUpdateResponse],
+    BaseRepository[Booking, BaseSchema],
 ):
-    def create(self, item: BookingCreateResponse) -> None:
-        return super().create(item)
+    def __init__(self, session: AsyncSession) -> None:
+        super().__init__(session, Booking)
 
-    def update(self, item: BookingUpdateResponse) -> None:
-        return super().update(item)
+    async def create(self, item: BookingCreateSchema) -> Booking:
+        return await super().create(item)
 
-    def delete(self, id: int) -> None:
-        return super().delete(id)
+    async def update(self, item: BookingUpdateSchema) -> Booking:
+        return await super().update(id, item)
 
-    def get(self, id: int) -> Booking | None:
-        return super().get(id)
+    async def delete(self, id: int) -> None:
+        return await super().delete(id)
 
-    def _map_to_entity(self, booking: BookingCreateResponse) -> Booking:
-        return Booking(
-            id=booking.id,
-            user_id=booking.user_id,
-            hotel_id=booking.hotel_id,
-            check_in=booking.check_in,
-            check_out=booking.check_out,
-            total_price=booking.total_price,
-            status=booking.status,
-        )
-
-    def _update_entity(
-        self, db_booking: Booking, booking: BookingUpdateResponse
-    ) -> None:
-        db_booking.user_id = booking.user_id
-        db_booking.hotel_id = booking.hotel_id
-        db_booking.check_in = booking.check_in
-        db_booking.total_price = booking.total_price
-        db_booking.status = booking.status
+    async def get(self, id: int) -> Booking | None:
+        return await super().get_by_id(id)
